@@ -24,7 +24,7 @@ export default function useAnalyticsWorkspaces() {
       }))
   }
 
-  const shouldFetch = Boolean(token && params.id)
+  const shouldFetch = Boolean(token)
   const { data, error, isValidating } = useSWR(
     shouldFetch ? `${host}/v1/user/workspaces` : null,
     fetcher

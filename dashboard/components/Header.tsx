@@ -105,12 +105,12 @@ export default function Header() {
   )
 }
 
-function AddPropertyModal({
+export function AddPropertyModal({
   isOpen,
   onClose,
 }: {
   isOpen: boolean
-  onClose: () => void
+  onClose: (() => void )| null
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -183,7 +183,7 @@ function AddPropertyModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose ?? (() => {})}>
       <Modal.Content className="z-[300] relative">
         <Modal.Title className="text-xl font-semibold mb-4">
           Add website to track
@@ -215,14 +215,14 @@ function AddPropertyModal({
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button
+            {onClose ? <Button
               variant="secondary"
               color="slate"
               onClick={onClose}
               disabled={isLoading}
             >
               Cancel
-            </Button>
+            </Button> : null}
             <Button
               onClick={handleAddProperty}
               loading={isLoading}
