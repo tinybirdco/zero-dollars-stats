@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter, usePathname } from 'next/navigation'
 import { SelectBox, SelectBoxItem, TextInput, Button } from '@tremor/react'
 
 import { HostType } from '../../lib/types/credentials'
@@ -13,6 +13,7 @@ const hostOptions: OptionType<HostType>[] = [
 
 export default function CredentialsForm() {
   const router = useRouter()
+  const pathname = usePathname()
   const [hostType, setHostType] = useState<HostType>(hostOptions[0].value)
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -25,7 +26,7 @@ export default function CredentialsForm() {
     if (!token || (hostType === HostType.Other && !hostName)) return
     const host = hostType === HostType.Other ? hostName : hostType
     const params = new URLSearchParams({ token, host })
-    router.push({ pathname: router.pathname, search: params.toString() })
+    router.push(`${pathname}?${params.toString()}`)
   }
 
   return (

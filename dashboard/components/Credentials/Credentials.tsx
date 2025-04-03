@@ -1,18 +1,16 @@
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Modal from '../Modal'
 import CredentialsForm from './CredentialsForm'
+import { useSearchParams } from 'next/navigation'
 
 export default function Credentials() {
   const [isOpen, setIsOpen] = useState(false)
-
-  const { isReady } = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (!isReady) return
     setIsOpen(true)
     return () => setIsOpen(false)
-  }, [isReady])
+  }, [])
 
   return (
     <Modal isOpen={isOpen} onClose={() => undefined}>

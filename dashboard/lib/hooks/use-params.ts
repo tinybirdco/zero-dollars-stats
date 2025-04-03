@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function useParams<T extends string>({
   key,
@@ -10,22 +10,17 @@ export default function useParams<T extends string>({
   values: T[]
 }): [T, (param: T) => void] {
   const router = useRouter()
-  const param = router.query[key] as T
+  const searchParams = useSearchParams()
+  const param = searchParams.get(key) as T
   const value =
     typeof param === 'string' && values.includes(param)
       ? param
       : defaultValue ?? values[0]
 
   const setParam = (param: T) => {
-    const searchParams = new URLSearchParams(window.location.search)
-    searchParams.set(key, param)
-    router.push(
-      {
-        query: searchParams.toString(),
-      },
-      undefined,
-      { scroll: false }
-    )
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(key, param)
+    router.push(`?${params.toString()}`)
   }
 
   return [value, setParam]

@@ -11,6 +11,7 @@ export default function KpisTabs({
   value: selectedKpi,
   totals,
 }: KpisTabsProps) {
+
   return (
     <div
       role="tablist"

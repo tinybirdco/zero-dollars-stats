@@ -1,16 +1,18 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
-import Script from 'next/script'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import Widgets from '../components/Widgets'
-import Credentials from '../components/Credentials'
-import useAuth from '../lib/hooks/use-auth'
-import Meta from '../components/Meta'
-import ErrorModal from '../components/ErrorModal'
-import config from '../lib/config'
+import Script from 'next/script';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import Widgets from '../../components/Widgets';
+import Credentials from '../../components/Credentials';
+import useAuth from '../../lib/hooks/use-auth';
+import { useAuthContext } from '../../lib/providers/auth-provider';
+import ErrorModal from '../../components/ErrorModal';
 
 export default function DashboardPage() {
   const { isAuthenticated, isTokenValid } = useAuth()
+  const { trackerToken } = useAuthContext()
 
   return (
     <>
@@ -18,23 +20,9 @@ export default function DashboardPage() {
         <Script
           defer
           src="https://unpkg.com/@tinybirdco/flock.js"
-          data-token={config.trackerToken}
+          data-token={trackerToken}
         />
       )}
-      <Meta />
-      <div className="h-12 bg-primary text-sm leading-5 text-secondary flex items-center justify-center gap-2">
-        📊{' '}
-        <div>
-          <span className="font-semibold">Tinybird Charts</span>: Create
-          in-product analytics or internal dashboards in minutes.{' '}
-          <a
-            href="https://www.tinybird.co/docs/publish/charts"
-            className="underline"
-          >
-            Learn more
-          </a>
-        </div>
-      </div>
       <div className="min-h-screen px-5 py-5 text-sm leading-5 bg-body sm:px-10 text-secondary">
         <div className="mx-auto max-w-7xl">
           <div className="space-y-6 sm:space-y-10">
@@ -44,7 +32,7 @@ export default function DashboardPage() {
                 <Header />
               </>
             )}
-            <main>
+            <main>  
               {isAuthenticated && !isTokenValid && <ErrorModal />}
               {isAuthenticated && isTokenValid && <Widgets />}
               {!isAuthenticated && <Credentials />}

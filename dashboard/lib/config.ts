@@ -5,4 +5,7 @@ const config = {
   host: process.env.NEXT_PUBLIC_TINYBIRD_HOST as string,
 } as const
 
+export const LS_AUTH_TOKEN = 'ls_auth_token'
+export const LS_WORKSPACE_TOKEN = 'ls_workspace_token'
+
 export default config

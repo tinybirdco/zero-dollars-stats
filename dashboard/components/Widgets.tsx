@@ -1,3 +1,4 @@
+'use client'
 import InView from './InView'
 import {
   AreaChart,
@@ -8,14 +9,14 @@ import {
   PieChart,
   tinybirdBorderColor,
 } from '@tinybirdco/charts'
-import { fetcher, getConfig } from '../lib/api'
-import { useRouter } from 'next/router'
+import { fetcher, getConfig, useQueryPipe } from '../lib/api'
 import useDateFilter from '../lib/hooks/use-date-filter'
 import KpisTabs from './KpisTabs'
 import useKpis from '../lib/hooks/use-kpis'
 import useKpiTotals from '../lib/hooks/use-kpi-totals'
 import { typography } from '../styles/theme'
 import useDomain from '../lib/hooks/use-domain'
+import { useCurrentToken } from '../lib/hooks/use-current-token'
 
 const enum WidgetHeight {
   XLarge = 588,
@@ -25,10 +26,11 @@ const enum WidgetHeight {
 }
 
 export default function Widgets() {
-  const { query } = useRouter()
-  const { host, token } = getConfig(
-    typeof query === 'string' ? query : undefined
-  )
+  const { token } = useCurrentToken()
+  const { host } = getConfig()
+
+  console.log('token', token)
+
   function buildEndointUrl(host: string, endpoint: string) {
     const apiUrl =
       {
@@ -36,8 +38,23 @@ export default function Widgets() {
         'https://ui.us-east.tinybird.co': 'https://api.us-east.tinybird.co',
       }[host] ?? host
 
-    return `${apiUrl}/v0/pipes/${endpoint}.json`
+    return `${process.env.NEXT_PUBLIC_TINYBIRD_HOST}/v0/pipes/${endpoint}.json?token=${token}`
   }
+
+  const { startDate, endDate } = useDateFilter()
+  const { kpi, setKpi } = useKpis()
+  const { data: kpiTotals } = useKpiTotals()
+
+  const { domain } = useDomain()
+
+  if (!host) {
+    return <div>No host</div>
+  }
+
+  if (!token) {
+    return <div>loading</div>
+  }
+
   const topSourcesEndpoint = buildEndointUrl(host, 'top_sources')
   const topPagesEndpoint = buildEndointUrl(host, 'top_pages')
   const topDevicesEndpoint = buildEndointUrl(host, 'top_devices')
@@ -45,16 +62,16 @@ export default function Widgets() {
   const topLocationsEndpoint = buildEndointUrl(host, 'top_locations')
   const trendEndpoint = buildEndointUrl(host, 'trend')
   const kpisEndpoint = buildEndointUrl(host, 'kpis')
-  const { startDate, endDate } = useDateFilter()
-  const { kpi, setKpi } = useKpis()
-  const { data: kpiTotals } = useKpiTotals()
-  const { domain } = useDomain()
 
   return (
     <ChartProvider
       queryConfig={{
         token,
-        fetcher,
+        fetcher: (url, options) =>
+          fetch(url, {
+            ...options,
+            headers: { Authorization: `Bearer ${token}` },
+          }).then(res => res.json()),
       }}
       styles={{
         borderRadius: 8,
@@ -68,9 +85,8 @@ export default function Widgets() {
       <div className="grid grid-cols-2 gap-5 sm:gap-10 grid-rows-3-auto">
         <div
           className="col-span-2 relative"
-          style={{ height: WidgetHeight.XLarge }}
         >
-          <div className="absolute top-0 left-0 right-0 z-10">
+          <div className="top-0 left-0 right-0 -mb-2">
             <KpisTabs value={kpi} onChange={setKpi} totals={kpiTotals} />
           </div>
           <AreaChart
@@ -87,7 +103,7 @@ export default function Widgets() {
               grid: {
                 left: '2%',
                 right: '2%',
-                top: 140,
+                top: 0,
                 bottom: 0,
                 containLabel: true,
               },

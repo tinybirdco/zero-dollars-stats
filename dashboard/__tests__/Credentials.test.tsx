@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Credentials from '../components/Credentials'

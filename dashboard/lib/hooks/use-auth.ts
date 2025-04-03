@@ -1,22 +1,25 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useAnalytics } from '../../components/Provider'
-import config from '../config'
+import { useAuthContext } from '../providers/auth-provider'
 
 export default function useAuth() {
-  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  const { authToken, host: configHost } = useAuthContext()
 
   let token, host
-  if (config.host && config.authToken) {
-    token = config.authToken
-    host = config.host
+  if (configHost && authToken) {
+    token = authToken
+    host = configHost
   } else {
-    const { token: tokenParam, host: hostParam } = router.query
-    token = typeof tokenParam === 'string' ? tokenParam : undefined
-    host = typeof hostParam === 'string' ? hostParam : undefined
+    token = searchParams.get('token') || undefined
+    host = searchParams.get('host') || undefined
   }
 
   const { error } = useAnalytics()
   const isTokenValid = !error || ![401, 403].includes(error.status ?? 0)
   const isAuthenticated = !!token && !!host
+
   return { isAuthenticated, token, host, isTokenValid }
 }

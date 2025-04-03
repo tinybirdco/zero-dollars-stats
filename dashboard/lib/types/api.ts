@@ -32,6 +32,7 @@ export type PipeParams<T> = Record<keyof T, string> & {
   limit: number
   date_to: string
   date_from: string
+  token?: string
 }
 
 export type QueryStatus = 'idle' | 'loading' | 'updating' | 'error' | 'success'

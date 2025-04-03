@@ -2,13 +2,25 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import { querySQL } from '../api'
 import { DomainData, DomainQueryData } from '../types/domain'
+import { useCurrentToken } from './use-current-token'
+import { useSearchParams } from 'next/navigation'
 
-async function getDomain(): Promise<DomainData> {
-  // Guess the instrumented domain, and exclude other domains like development or staging.
-  //  - Try to get the domain with most hits from the last hour.
-  //  - Fallback to 'some' domain.
-  // Best balance between data accuracy and performance I can get.
-  const { data } = await querySQL<DomainQueryData>(`
+const FALLBACK_LOGO = '/fallback-logo.png'
+
+export default function useDomain() {
+  const { token } = useCurrentToken()
+  const searchParams = useSearchParams()
+
+  const [logo, setLogo] = useState(FALLBACK_LOGO)
+
+  async function getDomain(): Promise<DomainData> {
+    // Guess the instrumented domain, and exclude other domains like development or staging.
+    //  - Try to get the domain with most hits from the last hour.
+    //  - Fallback to 'some' domain.
+    // Best balance between data accuracy and performance I can get.
+
+    const { data } = await querySQL<DomainQueryData>(
+      `
     with (
       SELECT nullif(domainWithoutWWW(href),'') as domain
       FROM analytics_hits
@@ -24,24 +36,19 @@ async function getDomain(): Promise<DomainData> {
       limit 1
     ) as some_domain
     select coalesce(top_domain, some_domain) as domain format JSON
-  `)
-  const domain = data[0]['domain'];
-  const logo = domain
-    ? `https://${domain}/favicon.ico`
-    : FALLBACK_LOGO
+  `,
+      token
+    )
+    const domain = data[0]['domain']
+    const logo = domain ? `https://${domain}/favicon.ico` : FALLBACK_LOGO
 
-  return {
-    domain,
-    logo,
+    return {
+      domain,
+      logo,
+    }
   }
-}
 
-const FALLBACK_LOGO = '/fallback-logo.png'
-
-export default function useDomain() {
-  const [logo, setLogo] = useState(FALLBACK_LOGO)
-
-  const { data } = useSWR('domain', getDomain, {
+  const { data } = useSWR(token ? 'domain' : null, getDomain, {
     onSuccess: ({ logo }) => setLogo(logo),
   })
 
@@ -50,7 +57,7 @@ export default function useDomain() {
   }
 
   return {
-    domain: data?.domain ?? 'domain.com',
+    domain: data?.domain ?? searchParams?.get('id') ?? 'domain.com',
     logo,
     handleLogoError,
   }
