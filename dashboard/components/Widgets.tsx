@@ -9,7 +9,7 @@ import {
   PieChart,
   tinybirdBorderColor,
 } from '@tinybirdco/charts'
-import { fetcher, getConfig, useQueryPipe } from '../lib/api'
+import { getConfig } from '../lib/api'
 import useDateFilter from '../lib/hooks/use-date-filter'
 import KpisTabs from './KpisTabs'
 import useKpis from '../lib/hooks/use-kpis'
@@ -84,16 +84,19 @@ export default function Widgets() {
     >
       <div className="grid grid-cols-2 gap-5 sm:gap-10 grid-rows-3-auto">
         <div
-          className="col-span-2 relative"
+          className="col-span-2 relative border bg-white rounded-lg overflow-hidden"
         >
           <div className="top-0 left-0 right-0 -mb-2">
             <KpisTabs value={kpi} onChange={setKpi} totals={kpiTotals} />
           </div>
+          <hr/>
           <AreaChart
             endpoint={kpisEndpoint}
             index="date"
             categories={[kpi]}
             boxShadow="none"
+            borderRadius={0}
+            borderColor="transparent"
             params={{
               date_from: startDate,
               date_to: endDate,

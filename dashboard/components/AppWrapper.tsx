@@ -10,7 +10,7 @@ interface AppWrapperProps extends AppProps {
 
 export function AppWrapper({ Component, pageProps, authToken, workspaceToken }: AppWrapperProps) {
   return (
-    <AuthProvider authToken={authToken} workspaceToken={workspaceToken}>
+    <AuthProvider authToken={authToken}>
       <AnalyticsProvider>
         <Component {...pageProps} />
       </AnalyticsProvider>

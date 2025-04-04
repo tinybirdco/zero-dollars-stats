@@ -1,6 +1,5 @@
 import {
   formatMinSec,
-  formatNumber,
   formatPercentage,
   kFormatter,
 } from '../../lib/utils'
@@ -12,6 +11,8 @@ export type KpisData = {
   bounce_rate: null | number
   avg_session_sec: number
 }
+
+export const formatNumber = (num: number) => Intl.NumberFormat().format(+num)
 
 const ALL_KPIS = [
   'visits',

@@ -2,12 +2,22 @@
 import CurrentVisitors from './CurrentVisitors'
 import DateFilter from './DateFilter'
 import useDomain from '../lib/hooks/use-domain'
-import { Button, Dropdown, DropdownItem, TextInput } from '@tremor/react'
+import { Button, TextInput } from '@tremor/react'
 import Modal from './Modal'
 import { useState } from 'react'
 import { useAuthContext } from '../lib/providers/auth-provider'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import useAnalyticsWorkspaces from '../lib/hooks/use-analytics-workspaces'
+import { useCurrentToken } from '../lib/hooks/use-current-token'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './DropdownMenu'
+import { GlobeIcon, PlusIcon } from 'lucide-react'
 
 const Logo = () => {
   const { logo, handleLogoError } = useDomain()
@@ -25,24 +35,25 @@ const Logo = () => {
 }
 
 export default function Header() {
-  
+  const { domain } = useDomain()
   const { data: workspaces } = useAnalyticsWorkspaces()
-  const { trackerToken } = useAuthContext()
-  
-  
+  const { token: trackerToken } = useCurrentToken()
+
   const searchParams = useSearchParams()
   const router = useRouter()
   const params = useParams()
-  
+
   const [isAddPropertyModalOpen, setIsAddPropertyModalOpen] = useState(false)
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
   const [isInstructionsModalOpen, setIsInstructionsModalOpen] = useState(
     searchParams.get('is_new') === 'true'
   )
-  
 
-  const fallbackDomain = (params.id?.toString() ?? '').split('_').slice(1, -1).join('.')
-  
+  const fallbackDomain = (params.id?.toString() ?? '')
+    .split('_')
+    .slice(1, -1)
+    .join('.')
+
   // Don't show instructions if we don't have a tracker token
   if (!trackerToken) {
     return null
@@ -50,24 +61,54 @@ export default function Header() {
 
   return (
     <header className="flex justify-between flex-col lg:flex-row gap-6">
-      <div className="flex gap-2 justify-between md:justify-start">
-        <div className="relative z-[100]">
-          <Dropdown icon={Logo} value={fallbackDomain}>
-            {(workspaces ?? [])?.map((ws: any) => (
-              <DropdownItem
-                key={ws.id}
-                value={ws.domain}
-                onClick={() => router.push(`/${ws.name}`)}
-              >
-                {ws.domain}
-              </DropdownItem>
-            ))}
-          </Dropdown>
+      <div className="flex gap-2 items-center justify-between md:justify-start">
+        <div className="relative space-y-1">
+          <div className="flex items-center gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <h1
+                  className="text-3xl font-semibold"
+                  style={{ color: 'var(--text-color)' }}
+                >
+                  {domain ?? fallbackDomain}
+                </h1>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuGroup>
+                  {(workspaces ?? [])?.map((ws: any) => (
+                    <DropdownMenuItem
+                      key={ws.id}
+                      onClick={() => router.push(`/${ws.name}`)}
+                    >
+                      <GlobeIcon className="w-4 h-4 mr-2" />
+                      {ws.domain}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setIsAddPropertyModalOpen(true)}
+                >
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  Add new property
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <p className="flex items-center gap-2" style={{ color: 'var(--text-02-color)' }}>
+            <CurrentVisitors />
+            /{' '}
+            <a
+              href="https://cloud.tinybird.co"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {params.id}
+            </a>
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setIsAddPropertyModalOpen(true)}>
-            Add property
-          </Button>
           <Button
             variant="secondary"
             color="slate"
@@ -76,7 +117,6 @@ export default function Header() {
             Help
           </Button>
         </div>
-        <CurrentVisitors />
       </div>
       <DateFilter />
 
@@ -89,7 +129,6 @@ export default function Header() {
         isOpen={isInstructionsModalOpen}
         onClose={() => {
           setIsInstructionsModalOpen(false)
-          // Remove is_new from URL
           const params = new URLSearchParams(searchParams.toString())
           params.delete('is_new')
           router.replace(`?${params.toString()}`)
@@ -110,7 +149,7 @@ export function AddPropertyModal({
   onClose,
 }: {
   isOpen: boolean
-  onClose: (() => void )| null
+  onClose: (() => void) | null
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -215,14 +254,16 @@ export function AddPropertyModal({
           </div>
 
           <div className="flex justify-end gap-3">
-            {onClose ? <Button
-              variant="secondary"
-              color="slate"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button> : null}
+            {onClose ? (
+              <Button
+                variant="secondary"
+                color="slate"
+                onClick={onClose}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            ) : null}
             <Button
               onClick={handleAddProperty}
               loading={isLoading}
@@ -302,7 +343,7 @@ function HelpModal({
   isOpen: boolean
   onClose: () => void
 }) {
-  const { trackerToken } = useAuthContext()
+  const { token: trackerToken } = useCurrentToken()
 
   const scriptCode = `<script defer
   src="https://unpkg.com/@tinybirdco/flock.js"

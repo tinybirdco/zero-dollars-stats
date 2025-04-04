@@ -1,0 +1,9 @@
+.sqlChartCard {
+    min-width: 240px;
+    flex: 1;
+    transition: border-color 0.2s ease-in-out;
+  }
+  
+  .sqlChartCard.clickable:hover {
+    border-color: var(--border-03-color);
+  }

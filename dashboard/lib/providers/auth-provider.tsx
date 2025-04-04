@@ -12,14 +12,12 @@ import { useCurrentToken } from '../hooks/use-current-token'
 
 export interface AuthContextType {
   dashboardURL: string | null
-  trackerToken: string | null
   authToken: string | null
   host: string | null
 }
 
 const AuthContext = createContext<AuthContextType>({
   dashboardURL: null,
-  trackerToken: null,
   authToken: null,
   host: null,
 })
@@ -27,30 +25,16 @@ const AuthContext = createContext<AuthContextType>({
 interface AuthProviderProps {
   children: ReactNode
   authToken: string | null
-  defaultWorkspaceToken: string | null
 }
 
 export function AuthProvider({
   children,
   authToken,
-  defaultWorkspaceToken,
 }: AuthProviderProps) {
-  const [workspaceToken, setWorkspaceToken] = useState(defaultWorkspaceToken)
-
-  const { token: currentToken } = useCurrentToken()
-
-  useEffect(() => {
-    // TODO: react from workspacetoken changing on query params and/or localstorage
-    if (workspaceToken) {
-      setWorkspaceToken(workspaceToken)
-    }
-  }, [workspaceToken])
-
   return (
     <AuthContext.Provider
       value={{
         authToken,
-        trackerToken: workspaceToken,
         dashboardURL: null,
         host: process.env.NEXT_PUBLIC_TINYBIRD_HOST ?? null,
       }}

@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./lib/auth0";
 
-
 export async function middleware(request: NextRequest) {
   // Handle OPTIONS requests
   if (request.method === "OPTIONS") {
     return NextResponse.next();
   }
 
+  const isAuthRoute = request.nextUrl.pathname.startsWith("/auth")
+
   // Get the auth response from Auth0
   const authRes = await auth.middleware(request);
 
   // Handle auth-related paths
-  if (request.nextUrl.pathname.startsWith("/auth")) {
+  if (isAuthRoute) {
     return authRes;
   }
 

@@ -1,0 +1,8 @@
+.container {
+  max-height: 600px;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-02-color);
+  border-radius: 4px;
+}

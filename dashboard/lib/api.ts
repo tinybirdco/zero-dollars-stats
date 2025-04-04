@@ -72,3 +72,4 @@ export function useQueryPipe<T>(
 export function querySQL<T>(sql: string, token: string): Promise<QuerySQL<T>> {
   return fetcher(`/v0/sql?q=${sql}`, token)
 }
+

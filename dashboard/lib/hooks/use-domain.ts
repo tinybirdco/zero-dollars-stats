@@ -57,7 +57,7 @@ export default function useDomain() {
   }
 
   return {
-    domain: data?.domain ?? searchParams?.get('id') ?? 'domain.com',
+    domain: data?.domain ?? searchParams?.get('id') ?? null,
     logo,
     handleLogoError,
   }
