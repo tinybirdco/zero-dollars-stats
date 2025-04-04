@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import CurrentVisitors from './CurrentVisitors'
-import DateFilter from './DateFilter'
 import useDomain from '../lib/hooks/use-domain'
 import { Button, TextInput } from '@tremor/react'
 import Modal from './Modal'
@@ -18,21 +17,12 @@ import {
   DropdownMenuTrigger,
 } from './DropdownMenu'
 import { GlobeIcon, PlusIcon } from 'lucide-react'
-
-const Logo = () => {
-  const { logo, handleLogoError } = useDomain()
-
-  return (
-    <img
-      src={logo}
-      alt=""
-      width={16}
-      height={16}
-      onError={handleLogoError}
-      loading="lazy"
-    />
-  )
-}
+import { Dialog, DialogContent, DialogTitle } from './Dialog'
+import { DialogDescription } from '@radix-ui/react-dialog'
+import { Text } from './Text'
+import { Stack } from './Stack'
+import { Select } from './Select'
+import { ChevronDownIcon } from './Icons'
 
 export default function Header() {
   const { domain } = useDomain()
@@ -56,69 +46,106 @@ export default function Header() {
 
   // Don't show instructions if we don't have a tracker token
   if (!trackerToken) {
-    return null
+    // make a similar layout than below out of <skeleton>
+    return (
+      <div className="flex justify-between w-full flex-col gap-3 lg:flex-row">
+        <Stack direction="column" spacing={0.5}>
+          <div className="w-40 h-5 bg-gray-200 animate-pulse" />
+          <div className="w-52 h-4 bg-gray-200 animate-pulse" />
+        </Stack>
+        <Stack gap={24}>
+          <div className="w-40 h-10 bg-gray-200 animate-pulse" />
+          <div className="w-40 h-10 bg-gray-200 animate-pulse" />
+        </Stack>
+      </div>
+    )
   }
 
   return (
-    <header className="flex justify-between flex-col lg:flex-row gap-6">
-      <div className="flex gap-2 items-center justify-between md:justify-start">
-        <div className="relative space-y-1">
-          <div className="flex items-center gap-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <h1
-                  className="text-3xl font-semibold"
-                  style={{ color: 'var(--text-color)' }}
-                >
-                  {domain ?? fallbackDomain}
-                </h1>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuGroup>
-                  {(workspaces ?? [])?.map((ws: any) => (
-                    <DropdownMenuItem
-                      key={ws.id}
-                      onClick={() => router.push(`/${ws.name}`)}
-                    >
-                      <GlobeIcon className="w-4 h-4 mr-2" />
-                      {ws.domain}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuGroup>
+    <div>
+      <Stack justify="space-between" width="100%">
+        <Stack direction="column" spacing={0.5}>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="outline-none select-none rounded-lg hover:bg-black/5 active:bg-black/5 focus:bg-black/5 px-2 -mx-2 transition-all duration-200">
+              <Text
+                variant="displaysmall"
+                className="!font-medium flex items-center"
+              >
+                {domain ?? fallbackDomain}
+                <ChevronDownIcon className="w-4 h-4 ml-2" />
+              </Text>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuGroup>
+                {(workspaces ?? [])?.map((ws: any) => (
+                  <DropdownMenuItem
+                    key={ws.id}
+                    onClick={() => router.push(`/${ws.name}`)}
+                  >
+                    <GlobeIcon className="w-4 h-4 mr-2" />
+                    {ws.domain}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
 
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setIsAddPropertyModalOpen(true)}
-                >
-                  <PlusIcon className="w-4 h-4 mr-2" />
-                  Add new property
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <p className="flex items-center gap-2" style={{ color: 'var(--text-02-color)' }}>
-            <CurrentVisitors />
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsAddPropertyModalOpen(true)}>
+                <PlusIcon className="w-4 h-4 mr-2" />
+                Add new property
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Text
+            color="02"
+            className="flex items-center gap-x-2.5 group transition-all duration-200"
+          >
+            <a
+              href={`https://${fallbackDomain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-x-1.5 group-hover:text-[#636679] hover:!text-[#25283d] transition-all duration-200"
+            >
+              https://{fallbackDomain}
+            </a>
             /{' '}
             <a
               href="https://cloud.tinybird.co"
               target="_blank"
               rel="noopener noreferrer"
+              className="flex items-center gap-x-1.5 group-hover:text-[#636679] hover:!text-[#25283d] transition-all duration-200"
             >
+              <img src="/zds-logo.png" alt="" width={16} height={16} />#
               {params.id}
             </a>
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            color="slate"
-            onClick={() => setIsHelpModalOpen(true)}
-          >
-            Help
-          </Button>
-        </div>
-      </div>
-      <DateFilter />
+          </Text>
+        </Stack>
+        <Stack gap={32}>
+          <Stack direction="column" gap={4}>
+            <Text color="01" variant="caption">
+              Users online
+            </Text>
+            <CurrentVisitors />
+          </Stack>
+          <Select
+            width={192}
+            value={searchParams.get('last_days') ?? '7'}
+            onValueChange={value => {
+              const params = new URLSearchParams(searchParams.toString())
+              params.set('last_days', value)
+              router.push(`?${params.toString()}`)
+            }}
+            options={[
+              { label: 'Today', value: '0' },
+              { label: 'Yesterday', value: '1' },
+              { label: 'Last 7 days', value: '7' },
+              { label: 'Last 30 days', value: '30' },
+              { label: 'Last 90 days', value: '90' },
+              { label: 'Last 365 days', value: '365' },
+            ]}
+          />
+        </Stack>
+      </Stack>
 
       <AddPropertyModal
         isOpen={isAddPropertyModalOpen}
@@ -140,7 +167,7 @@ export default function Header() {
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
       />
-    </header>
+    </div>
   )
 }
 
@@ -222,17 +249,17 @@ export function AddPropertyModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose ?? (() => {})}>
-      <Modal.Content className="z-[300] relative">
-        <Modal.Title className="text-xl font-semibold mb-4">
+    <Dialog open={isOpen} onOpenChange={onClose ?? (() => {})}>
+      <DialogContent className="z-[300] relative">
+        <DialogTitle className="text-xl font-semibold mb-4">
           Add website to track
-        </Modal.Title>
+        </DialogTitle>
 
-        <Modal.Description className="text-neutral-64 mb-6">
+        <DialogDescription className="text-neutral-64 mb-6">
           Add a website to start collecting analytics data. Enter the domain
           name of the website you want to track (e.g. example.com). Once added,
           we will provide you with a tracking script to add to your website.
-        </Modal.Description>
+        </DialogDescription>
 
         <div className="space-y-6">
           <div>
@@ -273,8 +300,8 @@ export function AddPropertyModal({
             </Button>
           </div>
         </div>
-      </Modal.Content>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -2,7 +2,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 import { Button } from '@tremor/react'
 import { useAnalytics } from './Provider'
-import Modal from './Modal'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from './Dialog'
 import { colors } from '../styles/theme'
 
 export default function ErrorModal() {
@@ -18,8 +18,8 @@ export default function ErrorModal() {
   }
 
   return (
-    <Modal isOpen={!!error} onClose={handleClose}>
-      <Modal.Content>
+    <Dialog open={!!error} onOpenChange={handleClose}>
+      <DialogContent>
         <span className="text-sm text-error font-semibold flex items-center gap-2 mb-4">
           <svg
             width="16"
@@ -38,15 +38,15 @@ export default function ErrorModal() {
           </svg>
           Error
         </span>
-        <Modal.Title className="text-2xl">
+        <DialogTitle className="text-2xl">
           {error?.message
             ? `${error.message.charAt(0).toUpperCase()}${error.message.slice(
                 1
               )}`
             : 'Something went wrong'}
-        </Modal.Title>
+        </DialogTitle>
         <div className="my-8">
-          <Modal.Description>
+          <DialogDescription>
             {`Go to `}
             <a
               href="https://docs.tinybird.co/api-reference/api-reference.html#authentication"
@@ -57,14 +57,14 @@ export default function ErrorModal() {
               https://docs.tinybird.co/api-reference/api-reference.html#authentication
             </a>
             {` for tips about how to fix this problem.`}
-          </Modal.Description>
+          </DialogDescription>
         </div>
         <div className="flex justify-end">
           <Button variant="secondary" color="slate" onClick={handleClose}>
             Close
           </Button>
         </div>
-      </Modal.Content>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -5,7 +5,7 @@ export default function CurrentVisitors() {
   return (
     <div className="flex items-center gap-2">
       <span className="rounded-full h-2 w-2 bg-success" />
-      <p className="text-neutral-64 truncate">{`${currentVisitors} current visitor${
+      <p className="text-neutral-64 truncate">{`${currentVisitors} visitor${
         currentVisitors === 1 ? '' : 's'
       }`}</p>
     </div>

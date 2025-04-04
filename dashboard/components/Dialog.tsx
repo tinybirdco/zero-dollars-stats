@@ -1,150 +1,105 @@
-// Tremor Dialog [v0.0.1]
+'use client'
 
-import React from "react";
-import * as DialogPrimitives from "@radix-ui/react-dialog";
+import * as React from 'react'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import styles from './Dialog.module.css'
 
-import { cx, focusRing } from "@/lib/utils";
+const Dialog = DialogPrimitive.Root
 
-const Dialog = (
-  props: React.ComponentPropsWithoutRef<typeof DialogPrimitives.Root>
-) => {
-  return <DialogPrimitives.Root {...props} />;
-};
-Dialog.displayName = "Dialog";
+const DialogTrigger = DialogPrimitive.Trigger
 
-const DialogTrigger = DialogPrimitives.Trigger;
+const DialogPortal = DialogPrimitive.Portal
 
-DialogTrigger.displayName = "DialogTrigger";
-
-const DialogClose = DialogPrimitives.Close;
-
-DialogClose.displayName = "DialogClose";
-
-const DialogPortal = DialogPrimitives.Portal;
-
-DialogPortal.displayName = "DialogPortal";
+const DialogClose = DialogPrimitive.Close
 
 const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitives.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitives.Overlay>
->(({ className, ...props }, forwardedRef) => {
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => {
   return (
-    <DialogPrimitives.Overlay
-      ref={forwardedRef}
-      className={cx(
-        // base
-        "fixed inset-0 z-50 overflow-y-auto",
-        // background color
-        "bg-black/70",
-        // transition
-        "data-[state=open]:animate-dialogOverlayShow",
-        className
-      )}
+    <DialogPrimitive.Overlay
+      ref={ref}
+      className={`${styles.overlay} ${className || ''}`}
       {...props}
     />
-  );
-});
+  )
+})
 
-DialogOverlay.displayName = "DialogOverlay";
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitives.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitives.Content>
->(({ className, ...props }, forwardedRef) => {
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => {
   return (
     <DialogPortal>
-      <DialogOverlay>
-        <DialogPrimitives.Content
-          ref={forwardedRef}
-          className={cx(
-            // base
-            "fixed left-1/2 top-1/2 z-50 w-[95vw] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-md border p-6 shadow-lg",
-            // border color
-            "border-gray-200 dark:border-gray-900",
-            // background color
-            "bg-white dark:bg-[#090E1A]",
-            // transition
-            "data-[state=open]:animate-dialogContentShow",
-            focusRing,
-            className
-          )}
-          tremor-id="tremor-raw"
-          {...props}
-        />
-      </DialogOverlay>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={`${styles.content} ${className || ''}`}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Content>
     </DialogPortal>
-  );
-});
+  )
+})
 
-DialogContent.displayName = "DialogContent";
+DialogContent.displayName = DialogPrimitive.Content.displayName
 
-const DialogHeader = ({
+function DialogHeader({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div className={cx("flex flex-col gap-y-1", className)} {...props} />;
-};
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={`${styles.header} ${className || ''}`} {...props} />
+}
 
-DialogHeader.displayName = "DialogHeader";
+function DialogFooter({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={`${styles.footer} ${className || ''}`} {...props} />
+}
 
 const DialogTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitives.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitives.Title>
->(({ className, ...props }, forwardedRef) => (
-  <DialogPrimitives.Title
-    ref={forwardedRef}
-    className={cx(
-      // base
-      "text-lg font-semibold",
-      // text color
-      "text-gray-900 dark:text-gray-50",
-      className
-    )}
-    {...props}
-  />
-));
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => {
+  return (
+    <DialogPrimitive.Title
+      ref={ref}
+      className={`${styles.title} ${className || ''}`}
+      {...props}
+    />
+  )
+})
 
-DialogTitle.displayName = "DialogTitle";
+DialogTitle.displayName = DialogPrimitive.Title.displayName
 
 const DialogDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitives.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitives.Description>
->(({ className, ...props }, forwardedRef) => {
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => {
   return (
-    <DialogPrimitives.Description
-      ref={forwardedRef}
-      className={cx("text-gray-500 dark:text-gray-500", className)}
+    <DialogPrimitive.Description
+      ref={ref}
+      className={`${styles.description} ${className || ''}`}
       {...props}
     />
-  );
-});
+  )
+})
 
-DialogDescription.displayName = "DialogDescription";
-
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div
-      className={cx(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-        className
-      )}
-      {...props}
-    />
-  );
-};
-
-DialogFooter.displayName = "DialogFooter";
+DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
   Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
-  DialogTrigger,
-};
+  DialogDescription
+}

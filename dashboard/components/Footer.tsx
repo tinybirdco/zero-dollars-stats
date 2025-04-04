@@ -1,31 +1,24 @@
-import useAuth from '../lib/hooks/use-auth'
+import Link from 'next/link'
+import { ArrowRightIcon } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { Text } from './Text'
 
 export default function Footer() {
-  const { token } = useAuth()
+  const params = useParams()
 
   return (
-    <footer className="w-full text-center text-sm flex flex-col gap-2">
-      <p>
-        Built with speed and privacy in mind using{' '}
-        <a
-          href="https://tinybird.co"
-          target="_blank"
-          rel="noreferrer"
-          className="text-[#2D27F7] font-semibold"
-        >
-          Tinybird
-        </a>
-      </p>
-      {!!token && (
-        <a
-          className="underline text-[#2D27F7] text-sm"
-          href="https://github.com/tinybirdco/web-analytics-starter-kit"
-          target="blank"
-          rel="noreferrer"
-        >
-          Customize this dashboard
-        </a>
-      )}
-    </footer>
+    <div className="bg-body border-t px-5 py-5 sm:px-10 pb-20">
+      <div className="mx-auto max-w-7xl flex md:flex-row flex-col justify-between gap-y-2">
+        <Text color="01">zerodollarstats is a tinybird product</Text>
+        <Text color="01">
+          <Link
+            href={`https://cloud.tinybird.co/gcp/europe-west3/${params.id}`}
+            className="flex items-center gap-x-1.5"
+          >
+            view your associated workspace <ArrowRightIcon size={16} />
+          </Link>
+        </Text>
+      </div>
+    </div>
   )
 }

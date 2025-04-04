@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Modal from '../Modal'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../Dialog'
 import CredentialsForm from './CredentialsForm'
 import { useSearchParams } from 'next/navigation'
 
@@ -13,16 +13,16 @@ export default function Credentials() {
   }, [])
 
   return (
-    <Modal isOpen={isOpen} onClose={() => undefined}>
-      <Modal.Content>
-        <Modal.Title id="credentials-title">Enter credentials</Modal.Title>
-        <Modal.Description>
+    <Dialog open={isOpen} onOpenChange={() => undefined}>
+      <DialogContent>
+        <DialogTitle id="credentials-title">Enter credentials</DialogTitle>
+        <DialogDescription>
           To visualize your analytics data in the pre-built dashboard, you need
           to specify a token with read access to the pipes, and your workspace
           Host.
-        </Modal.Description>
+        </DialogDescription>
         <CredentialsForm />
-      </Modal.Content>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   )
 }
